@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block start %}
+
+
+    
+
+
+    <div class="container mt-5 pt-5">
+        <div class="text-right float-right">
+            <button class="btn btn-info" onclick="getRaffelTicket()">Get Your raffle tickets</button>
+        </div>
+        <ul class="list-group mt-3">
+            <li class="list-group-item active" aria-current="true">Lucky draw</li>
+        
+            
+                {% for lucky_draw_obj in lucky_draw_objs %}
+                <li class="list-group-item">
+                    {{lucky_draw_obj.lucky_draw_name}}
+                    
+                    
+                        <button class="btn btn-danger" id="participate_btn" data-lucky_draw_id="{{lucky_draw_obj.id}}" data-ticket_id="{{ticke_obj.id}}" {% if ticke_obj %} onclick="participate()" {% else %}  onclick="tata.warn('Error' , 'You dont have ticket click get ticket')" {% endif %} >Participate in this Lucky Draw</button>
+                    
+
+                </li>
+                
+                    <li class="list-group-item active bg-success" aria-current="true">Prizes</li>
+                    {% for prize in lucky_draw_obj.prize.all %}
+                    <li class="list-group-item">{{prize.prize_name}} - {{prize.prize_date}}</li>
+                    {% endfor %}
+                   
+                {% endfor %}
+            
+         
+       
+    </ul>
+
+    </div>
+
+
+
+{% endblock %}
