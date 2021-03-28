@@ -60,10 +60,11 @@
                 <code>
                     {
                     "lucky_draw_id" : "{LUCKY DRAW ID}" , 
-                    "current_date" : "{DATE OF LUCKY DRAW}" ,
-                   
+                    "current_date" : "{DATE OF LUCKY DRAW}" 
                     }
-                </code>
+            
+            </code>
+            
 
 
 <hr>

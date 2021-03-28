@@ -96,19 +96,24 @@ class LuckyDrawWinners(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.ticket.user.username  + " won " + self.prize.prize_name
-    
+        if self.ticket:
+            return self.ticket.user.username  + " won " + self.prize.prize_name
+        return str(self.id)
     def get_winners(days = 7):
         result = []
         try:
             winner_objs = LuckyDrawWinners.objects.filter(created_at__gte=datetime.now()-timedelta(days=7 ))
             for winner_obj in winner_objs:
-                result.append({
-                  'lucky_draw_name' : winner_obj.lucky_draw.lucky_draw_name,
-                  'ticket' : winner_obj.ticket.ticket,
-                  'user' : winner_obj.ticket.user.username,
-                  'winning_date' : str(winner_obj.created_at)     
-                })
+                try:
+                    result.append({
+                    'lucky_draw_name' : winner_obj.lucky_draw.lucky_draw_name,
+                    'ticket' : winner_obj.ticket.ticket,
+                    'user' : winner_obj.ticket.user.username,
+                    'winning_date' : str(winner_obj.created_at)   ,
+                    'prize' : winner_obj.prize.prize_name
+                    })
+                except Exception as e: 
+                    print(e)
                     
                 
         except Exception as e: 
@@ -126,5 +131,6 @@ class GameParticipants(models.Model):
     
     
     def __str__(self):
-        return self.ticket.ticket + " " + self.ticket.user.username
-    
+        if self.ticket:
+            return self.ticket.ticket + " " + self.ticket.user.username
+        return str(self.id)

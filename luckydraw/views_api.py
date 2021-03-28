@@ -98,6 +98,7 @@ class GetWinnners(APIView):
         try:
             lucky_draw_winners_class = LuckyDrawWinners()
             winners_objs = lucky_draw_winners_class.get_winners()
+            print(winners_objs)
             response['status_code'] = 200
             response['status_message'] = 'Game winners'
             
@@ -130,10 +131,13 @@ class ComputeWinners(APIView):
                 response['status_message'] = 'current_date is required'
                 raise Exception('current_date is required')
                 
-            
+            print(data)
             
             lucky_draw_id =  data.get('lucky_draw_id') 
             current_date = data.get('current_date')
+            
+            print(lucky_draw_id)
+            print(current_date)
             
             lucky_draw_obj = None
             try:
@@ -147,10 +151,25 @@ class ComputeWinners(APIView):
             
             game_participants_objs  = GameParticipants.objects.filter(lucky_draw = lucky_draw_obj )
             
+            print(game_participants_objs)
+            
+            if len(game_participants_objs) == 0:
+                response['status_code'] = 300
+                response['status_message'] = f'No game participants found for lucky draw **{lucky_draw_obj.lucky_draw_name}**'
+                raise Exception('No game participants found')
+                
+                
+            
+            
             # Getting random object for game winner
             lucky_draw_winner = random.choice(game_participants_objs)
             
-            current_date = datetime.strptime(current_date, "%Y-%m-%d").date()
+            try:
+                current_date = datetime.strptime(current_date, "%Y-%m-%d").date()
+            except Exception as e:
+                response['status_message'] = f"{current_date} value has an invalid date format. It must be in YYYY-MM-DD format."
+                print('Invalid date format')
+            
             # Getting prize obj
             prize_obj = lucky_draw_obj.prize.filter(prize_date=current_date).first()
             

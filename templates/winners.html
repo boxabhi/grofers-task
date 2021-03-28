@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block start %}
+
+
+<div class="container mt-5 pt-5">
+    <ul class="list-group" id="winners">
+        <li class="list-group-item active" aria-current="true">Winner of Lucky Draws </li>
+      
+      </ul>
+</div>
+
+
+<script>
+
+
+function getWinnners() {
+    var element = document.getElementById('winners')
+    console.log("window")
+    fetch('/api/get-winners/')
+    .then(result => result.json())
+    .then(response => {
+
+        if(response.status_code == 200) {
+            var html =  `
+        <li class="list-group-item active" aria-current="true">Winner of Lucky Draws </li>    
+            `
+
+            for(var i=0; i < response.data.length; i++) {
+                html += ` 
+                <li class="list-group-item"><b>${response.data[i].user}</b> won lucky draw <b>${response.data[i].lucky_draw_name}</b> prize  <b> ${response.data[i].prize} </b></li>
+                `
+            }
+
+            element.innerHTML = html
+        }
+
+        console.log(response)
+    })
+
+}
+
+getWinnners()
+
+</script>
+
+
+{% endblock %}

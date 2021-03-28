@@ -14,3 +14,6 @@ def home(request):
     
     
     return render(request , 'home.html' , context)
+
+def winnners(request):
+    return render(request , 'winners.html')

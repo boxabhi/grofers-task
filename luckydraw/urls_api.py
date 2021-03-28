@@ -9,6 +9,5 @@ urlpatterns = [
     path('get-winners/' , GetWinnners),
     path('participate-in-game/' , ParticipateInGame),
     path('compute-winners/' , ComputeWinners),
-    
     path('login/' , Login)
 ]
