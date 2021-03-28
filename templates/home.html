@@ -2,6 +2,7 @@
 {% block start %}
 
 
+{% if request.user.is_authenticated %}
     
 
 
@@ -18,7 +19,7 @@
                     {{lucky_draw_obj.lucky_draw_name}}
                     
                     
-                        <button class="btn btn-danger" id="participate_btn" data-lucky_draw_id="{{lucky_draw_obj.id}}" data-ticket_id="{{ticke_obj.id}}" {% if ticke_obj %} onclick="participate()" {% else %}  onclick="tata.warn('Error' , 'You dont have ticket click get ticket')" {% endif %} >Participate in this Lucky Draw</button>
+                        <button class="btn btn-danger" id="participate_btn-{{lucky_draw_obj.id}}" data-lucky_draw_id="{{lucky_draw_obj.id}}" data-ticket_id="{{ticke_obj.id}}" {% if ticke_obj %} onclick="participate('{{lucky_draw_obj.id}}')" {% else %}  onclick="tata.warn('Error' , 'You dont have ticket click get ticket')" {% endif %} >Participate in this Lucky Draw</button>
                     
 
                 </li>
@@ -36,6 +37,11 @@
 
     </div>
 
+    {% else %}
 
+    <div class="text-center mt-5 pt-5">
+        <p>Login to explore Lucky Draws</p>
+    </div>
+    {% endif %}
 
 {% endblock %}

@@ -131,13 +131,12 @@ class ComputeWinners(APIView):
                 response['status_message'] = 'current_date is required'
                 raise Exception('current_date is required')
                 
-            print(data)
+
             
             lucky_draw_id =  data.get('lucky_draw_id') 
             current_date = data.get('current_date')
             
-            print(lucky_draw_id)
-            print(current_date)
+
             
             lucky_draw_obj = None
             try:
@@ -172,6 +171,24 @@ class ComputeWinners(APIView):
             
             # Getting prize obj
             prize_obj = lucky_draw_obj.prize.filter(prize_date=current_date).first()
+            
+            if prize_obj is None:
+                response['status_message'] = f"No lucky draw found on this date **{current_date} **"
+                raise Exception(f'No lucky draw found on this date **{current_date} **')
+            
+            
+            
+            if prize_obj.is_winner_calculated:
+                response['status_code'] = 300
+                response['status_message'] = f'Winner is already declared for **{lucky_draw_obj.lucky_draw_name}** date **{current_date}**'
+                raise Exception('Luckt draw already declared')
+                
+            
+            
+            prize_obj.is_winner_calculated = True
+            prize_obj.save()
+            
+            
             
             if prize_obj is None:
                 response['status_message'] = 'No lucky draw found on date'
@@ -217,11 +234,24 @@ class ParticipateInGame(APIView):
         
         try:
             data = request.data
-            
-
+            user_obj = None
             ticket_id = data.get('ticket_id')
             lucky_draw_id = data.get('lucky_draw_id')
             
+            if request.user.is_authenticated:
+                user_obj = request.user
+            else:
+                user_id = data.get('user_id')
+                if user_id is None:
+                    response['status_message'] = 'user_id is required'
+                    raise Exception('user_id is required')
+                try:
+                    user_obj = User.objects.get(id = user_id) 
+                except Exception as e:
+                    response['status_message'] = 'user does not exist'
+                    return Response(response)
+                    
+                    
             
             if ticket_id is None:
                 response['status_message'] = 'ticket_id is required'
@@ -235,15 +265,30 @@ class ParticipateInGame(APIView):
             lucky_draw_obj = LuckyDraws.objects.get(id = lucky_draw_id)
             ticket_obj = Tickets.objects.get(id = ticket_id)
             
-            if GameParticipants.objects.filter(lucky_draw = lucky_draw_obj ,ticket = ticket_obj).first():
+            
+            if ticket_obj.is_ticket_used:
+                response['status_code'] = 300
+                response['status_message'] = 'sorry this ticket is already used'
+                raise Exception('ticker already used')
+            
+
+            
+            
+            if GameParticipants.objects.filter(lucky_draw = lucky_draw_obj ,user = user_obj).first():
                 response['status_code'] = 300
                 response['status_message'] = 'You have already participated in this LuckyDraw'
                 raise Exception('already participated')
             
+            
+            
+
             game_participant_objs =  GameParticipants.objects.create(
                 lucky_draw= lucky_draw_obj,
-                ticket=ticket_obj
-            )               
+                ticket=ticket_obj,
+                user = user_obj
+            )   
+            ticket_obj.is_ticket_used = True
+            ticket_obj.save()            
             
 
         

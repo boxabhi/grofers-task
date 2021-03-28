@@ -1,6 +1,5 @@
 var csrf = document.getElementById('csrf').value
 
-console.log("ss")
 
 
 function refreshPage() {
@@ -30,10 +29,7 @@ function login() {
         .then(response => {
             if (response.status_code == 200) {
                 tata.success('Success', response.status_message)
-                setTimeout(() => {
-                    window.location.relod()
-                }, 1500)
-
+               refreshPage()
             } else {
                 // tata.error('Error', response.message)
 
@@ -62,11 +58,14 @@ function getRaffelTicket() {
 }
 
 
-function participate() {
-    var element = document.getElementById('participate_btn')
+function participate(id) {
+    var element = document.getElementById(`participate_btn-${id}`)
 
     var lucky_draw_id = element.dataset.lucky_draw_id
     var ticket_id = element.dataset.ticket_id
+
+    console.log(lucky_draw_id)
+    console.log(ticket_id)
 
     fetch('/api/participate-in-game/', {
             method: 'POST',

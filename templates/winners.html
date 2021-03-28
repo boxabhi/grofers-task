@@ -25,6 +25,15 @@ function getWinnners() {
         <li class="list-group-item active" aria-current="true">Winner of Lucky Draws </li>    
             `
 
+            if(response.data.length == 0){
+                html += ` 
+                <li class="list-group-item"><b> No winner declared  </b></li>
+                `
+                element.innerHTML = html
+                return
+            }
+
+
             for(var i=0; i < response.data.length; i++) {
                 html += ` 
                 <li class="list-group-item"><b>${response.data[i].user}</b> won lucky draw <b>${response.data[i].lucky_draw_name}</b> prize  <b> ${response.data[i].prize} </b></li>

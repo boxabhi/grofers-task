@@ -38,7 +38,7 @@ class Tickets(models.Model):
 class Prizes(models.Model):
     prize_name = models.CharField(max_length=100)
     prize_date = models.DateField()
-    
+    is_winner_calculated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)    
     
@@ -123,6 +123,7 @@ class LuckyDrawWinners(models.Model):
         return result
 
 class GameParticipants(models.Model):
+    user = models.ForeignKey(User , on_delete=models.SET_NULL , null=True , blank=True)
     lucky_draw = models.ForeignKey(LuckyDraws , on_delete=models.SET_NULL , null=True , blank=True)
     ticket = models.ForeignKey(Tickets , on_delete=models.SET_NULL , null=True , blank=True)
     is_won = models.BooleanField(default=False)

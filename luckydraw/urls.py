@@ -6,5 +6,6 @@ urlpatterns = [
     
     path('' , home , name='home'),
     path('winners/' , winnners , name='winners'),
+    path('logout/' , logout_view , name='logout')
     
 ]

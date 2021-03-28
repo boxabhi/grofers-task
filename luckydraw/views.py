@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render , redirect
 from .models import *
+from django.contrib.auth import logout
 # Create your views here.
 
 
@@ -17,3 +18,8 @@ def home(request):
 
 def winnners(request):
     return render(request , 'winners.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
