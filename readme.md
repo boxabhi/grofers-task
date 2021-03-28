@@ -35,6 +35,7 @@
                    <kbd >/api/participate-in-game/</kbd>
                     <code>
                     {
+                     "user_id" : "{USER ID}",
                     "ticket_id" : "{TICKET ID}" , 
                     "lucky_draw_id" : "{LUCKY DRAW ID}" 
                     }
@@ -56,7 +57,7 @@
 <pre>
                 <p>Task 5</p>
              <code >API for computing winners. <span class="badge badge-success">ACCEPTS POST REQUEST</span>
-                <kbd >/update/</kbd>
+                <kbd >/api/compute-winners/</kbd>
                 <code>
                     {
                     "lucky_draw_id" : "{LUCKY DRAW ID}" , 
