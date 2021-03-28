@@ -98,7 +98,7 @@ class GetWinnners(APIView):
         try:
             lucky_draw_winners_class = LuckyDrawWinners()
             winners_objs = lucky_draw_winners_class.get_winners()
-            print(winners_objs)
+
             response['status_code'] = 200
             response['status_message'] = 'Game winners'
             
@@ -122,23 +122,29 @@ class ComputeWinners(APIView):
         
         try:
             data = request.data
+                        
+            lucky_draw_id =  data.get('lucky_draw_id') 
+            current_date = data.get('current_date')
             
-            if data.get('lucky_draw_id') is None:
+            # Validation checks for lucky_draw_id,current_date
+            
+            if lucky_draw_id is None:
                 response['status_message'] = 'lucky_draw_id is required'
                 raise Exception('lucky_draw_id is required')
             
-            if data.get('current_date') is None:
+            if current_date is None:
                 response['status_message'] = 'current_date is required'
                 raise Exception('current_date is required')
                 
 
-            
-            lucky_draw_id =  data.get('lucky_draw_id') 
-            current_date = data.get('current_date')
+
             
 
             
             lucky_draw_obj = None
+            
+            # Getting Lucky draw obj
+            
             try:
                 lucky_draw_obj = LuckyDraws.objects.get(id = lucky_draw_id)
             except Exception as e:
@@ -148,9 +154,12 @@ class ComputeWinners(APIView):
             if lucky_draw_obj is None:
                 raise Exception('lucky_draw_obj is None')
             
+            
+            # Getting all game participant for the Lucky draw
+            
             game_participants_objs  = GameParticipants.objects.filter(lucky_draw = lucky_draw_obj )
             
-            print(game_participants_objs)
+
             
             if len(game_participants_objs) == 0:
                 response['status_code'] = 300
@@ -163,6 +172,7 @@ class ComputeWinners(APIView):
             # Getting random object for game winner
             lucky_draw_winner = random.choice(game_participants_objs)
             
+            # Valid date format Check
             try:
                 current_date = datetime.strptime(current_date, "%Y-%m-%d").date()
             except Exception as e:
@@ -177,24 +187,16 @@ class ComputeWinners(APIView):
                 raise Exception(f'No lucky draw found on this date **{current_date} **')
             
             
-            
+            # Checking is winner already declared for this Lucky draw
             if prize_obj.is_winner_calculated:
                 response['status_code'] = 300
                 response['status_message'] = f'Winner is already declared for **{lucky_draw_obj.lucky_draw_name}** date **{current_date}**'
                 raise Exception('Luckt draw already declared')
                 
             
-            
-            prize_obj.is_winner_calculated = True
-            prize_obj.save()
-            
-            
-            
             if prize_obj is None:
                 response['status_message'] = 'No lucky draw found on date'
-                raise Exception('No lucky draw found on date ')
-                
-                
+                raise Exception('No lucky draw found on date ')                
                 
         
             # Creating Lucky Draw Winner 
@@ -205,9 +207,10 @@ class ComputeWinners(APIView):
             )
             
             lucky_draw_winner.is_won = True
+            prize_obj.is_winner_calculated = True
+            prize_obj.save()
             
             payload = {}
-            
             response['status_code'] = 200
             response['status_message'] = 'Winner computed successfully'
             
@@ -238,6 +241,9 @@ class ParticipateInGame(APIView):
             ticket_id = data.get('ticket_id')
             lucky_draw_id = data.get('lucky_draw_id')
             
+            
+            # Getting user object if user is authenticated or getting via json response
+            
             if request.user.is_authenticated:
                 user_obj = request.user
             else:
@@ -252,7 +258,7 @@ class ParticipateInGame(APIView):
                     return Response(response)
                     
                     
-            
+            # Validation checks for ticket_id and lucky_draw_id
             if ticket_id is None:
                 response['status_message'] = 'ticket_id is required'
                 raise Exception('ticket_id is required')
@@ -265,7 +271,7 @@ class ParticipateInGame(APIView):
             lucky_draw_obj = LuckyDraws.objects.get(id = lucky_draw_id)
             ticket_obj = Tickets.objects.get(id = ticket_id)
             
-            
+            # Checking is ticket already used in some other LuckyDraw
             if ticket_obj.is_ticket_used:
                 response['status_code'] = 300
                 response['status_message'] = 'sorry this ticket is already used'
@@ -273,7 +279,7 @@ class ParticipateInGame(APIView):
             
 
             
-            
+            # Checking user has already participated in this lucky draw
             if GameParticipants.objects.filter(lucky_draw = lucky_draw_obj ,user = user_obj).first():
                 response['status_code'] = 300
                 response['status_message'] = 'You have already participated in this LuckyDraw'
@@ -281,25 +287,23 @@ class ParticipateInGame(APIView):
             
             
             
-
+            # Finally Creating Game Participant
             game_participant_objs =  GameParticipants.objects.create(
                 lucky_draw= lucky_draw_obj,
                 ticket=ticket_obj,
                 user = user_obj
             )   
+            
+            ''' 
+            After game participant is created setting ticket to True
+            so that it can't be used in some other Lucky Draw
+            '''
             ticket_obj.is_ticket_used = True
             ticket_obj.save()            
-            
-
-        
             response['status_code'] = 200
             response['status_message'] = 'You have successfully participated in Lucky draw'    
-            
-            
-                    
         except Exception as e:
             print(e)
-            
         return Response(response)
         
         

@@ -99,6 +99,7 @@ class LuckyDrawWinners(models.Model):
         if self.ticket:
             return self.ticket.user.username  + " won " + self.prize.prize_name
         return str(self.id)
+    
     def get_winners(days = 7):
         result = []
         try:
@@ -121,6 +122,13 @@ class LuckyDrawWinners(models.Model):
             
             
         return result
+
+
+
+''''
+GameParticipants 
+
+''''
 
 class GameParticipants(models.Model):
     user = models.ForeignKey(User , on_delete=models.SET_NULL , null=True , blank=True)
