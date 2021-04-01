@@ -125,10 +125,10 @@ class LuckyDrawWinners(models.Model):
 
 
 
-''''
+'''
 GameParticipants 
 
-''''
+'''
 
 class GameParticipants(models.Model):
     user = models.ForeignKey(User , on_delete=models.SET_NULL , null=True , blank=True)
