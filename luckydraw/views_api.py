@@ -14,6 +14,8 @@ class Login(APIView):
             
             user_obj,_ = User.objects.get_or_create(username=data.get('username'))
             
+            # Direct login without checking password for testing
+
             login( request , user_obj)
             response['status_code'] = 200
             response['status_message'] = 'Login'
@@ -67,6 +69,7 @@ class GetLuckyDraws(APIView):
         
         try:
             lucky_draw_class = LuckyDraws()
+            # Getting active Lucky Draws
             lucky_draw_payload = lucky_draw_class.get_active_lucky_draws()
             
             
@@ -97,6 +100,8 @@ class GetWinnners(APIView):
         response['status_message'] = 'Something went wrong'
         try:
             lucky_draw_winners_class = LuckyDrawWinners()
+
+            # Getting Winners 
             winners_objs = lucky_draw_winners_class.get_winners()
 
             response['status_code'] = 200
@@ -154,6 +159,12 @@ class ComputeWinners(APIView):
             if lucky_draw_obj is None:
                 raise Exception('lucky_draw_obj is None')
             
+            if not lucky_draw_obj.is_active:
+                response['status_message'] = 'lucky_draw is over'
+                raise Exception('lucky_draw is over')
+
+
+
             
             # Getting all game participant for the Lucky draw
             
@@ -269,6 +280,14 @@ class ParticipateInGame(APIView):
 
                 
             lucky_draw_obj = LuckyDraws.objects.get(id = lucky_draw_id)
+
+
+            # Checking is Lucky Draw over?
+            if not lucky_draw_obj.is_active:
+                response['status_message'] = 'lucky_draw is over'
+                raise Exception('lucky_draw is over')
+
+
             ticket_obj = Tickets.objects.get(id = ticket_id)
             
             # Checking is ticket already used in some other LuckyDraw
